@@ -1,7 +1,6 @@
 import express, {Request, Response} from 'express';
 const app = express();
 app.use(express.json());
-
 const router = express.Router();
 let productoMercancia = [ 
     {nombre: "Toyota", modelo:"GT86", precio:15000, paisOrigen:"Japon" },
@@ -18,6 +17,18 @@ router.get('/products/menoresacien', (_: Request, res: Response) => {
     res.json(productoMercancia);
 });
 // 3
+router.put('/products/modificar/:modelo', (req: Request, res: Response) => {
+    const{ Modelo } = req.params;
+    const nuevoProducto = req.body;
+
+    const productoExistente = productoMercancia.find((producto) => producto.modelo === Modelo);
+    if (!productoExistente){
+        res.status(400).json({message: "Producto no existente"});
+    } else {
+        Object.assign(productoExistente, nuevoProducto);
+        res.status(202).send({message: "Producto modificado", producto: productoExistente});
+    }
+});
 // 4
 router.get('/products/:modelo', (req: Request, res: Response) => {
     const {modelo} = req.params;
@@ -73,7 +84,11 @@ router.get('/products/porprecio/:precio', (req: Request, res: Response) => {
 });
 
 //7
-
+router.post('/createProducts', (req, res) => {
+    const getProduct = req.body;
+    productoMercancia.push(getProduct);
+    res.status(201).send(productoMercancia);
+});
 
 
 
