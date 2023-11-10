@@ -1,94 +1,35 @@
-import express, {Request, Response} from 'express';
+import express from 'express';
+import { getProducts, getProductsByPrice, SetNewProduct, getProductByModel, getProductByPais, getProductByPrecio, pushGetProduct } from '../Controllers/controller';
+
+
 const app = express();
 app.use(express.json());
 const router = express.Router();
-let productoMercancia = [ 
-    {nombre: "Toyota", modelo:"GT86", precio:15000, paisOrigen:"Japon" },
-    {nombre: "Amd", modelo:"Ryzen7", precio:50, paisOrigen:"China" },
-    {nombre: "Iphone", modelo:"15Pro", precio:1200, paisOrigen:"USA" }
-];
+
 // 1
-router.get('/products', (_: Request, res: Response) => {
-    res.send(productoMercancia);
-});
+router.get('/products', getProducts);
+
 // 2
-router.get('/products/menoresacien', (_: Request, res: Response) => {
-    res.send(productoMercancia.filter(productos => productos.precio < 100));
-    res.json(productoMercancia);
-});
+
+router.get('/products/menoresacien', getProductsByPrice);
+
+
 // 3
-router.put('/products/modificar/:modelo', (req: Request, res: Response) => {
-    const{ Modelo } = req.params;
-    const nuevoProducto = req.body;
 
-    const productoExistente = productoMercancia.find((producto) => producto.modelo === Modelo);
-    if (!productoExistente){
-        res.status(400).json({message: "Producto no existente"});
-    } else {
-        Object.assign(productoExistente, nuevoProducto);
-        res.status(202).send({message: "Producto modificado", producto: productoExistente});
-    }
-});
+router.put('/products/modificar/:modelo', SetNewProduct);
+
 // 4
-router.get('/products/:modelo', (req: Request, res: Response) => {
-    const {modelo} = req.params;
-    const longitud = productoMercancia.length;
-
-    productoMercancia = productoMercancia.filter(producto => producto.modelo !== modelo);
-    
-    if (productoMercancia.length === longitud) {
-        res.status(404).send('producto no encontrado');
-        console.log('producto no encontrado');
-    } else {
-        res.send('Producto eliminado');
-        console.log('Producto eliminado');
-    }
-});
-
-// app.get('/products/eliminar/:modelo', (req: Request, res: Response) => {
-//     const modelo = req.params.modelo;
-//     const indice = productoMercancia.findIndex((producto) => producto.modelo === modelo);
-  
-//     if (indice !== -1) {
-//       // Eliminar el producto
-//       productoMercancia.splice(indice, 1);
-//       res.send(`Producto con modelo ${modelo} eliminado.`);
-//     } else {
-//       res.status(404).send(`Producto con modelo ${modelo} no encontrado.`);
-//     }
-//   });
-
+router.get('/products/:modelo', getProductByModel);
 
 
 // 5
-router.get('/products/porpais/:pais', (req: Request, res: Response) => {
-    const { pais } = req.params;
-    const productFound = productoMercancia.find(producto => producto.paisOrigen === pais);
-    if (productFound){
-        res.json(productFound);
-    } else{
-        res.status(404).send('Producto sin encontrar');
-    }
-});
+router.get('/products/porpais/:pais', getProductByPais);
 
 // 6
-router.get('/products/porprecio/:precio', (req: Request, res: Response) => {
-    const {precio} = req.params;
-    const productFound = productoMercancia.find(producto => producto.precio === Number(precio));
-    if (productFound) {
-        res.json(productFound);
-    }  else {
-        res.status(404).send('Producto sin encontrar');
-    }
-   
-});
+router.get('/products/porprecio/:precio', getProductByPrecio);
 
 //7
-router.post('/createProducts', (req, res) => {
-    const getProduct = req.body;
-    productoMercancia.push(getProduct);
-    res.status(201).send(productoMercancia);
-});
+router.post('/createProducts', pushGetProduct);
 
 
 
