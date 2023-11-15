@@ -2,19 +2,18 @@ import {DataSource} from 'typeorm';
 import {Product} from './product';
 import "reflect-metadata";
 
-const AppDataSource = new DataSource({
+export const AppDataSource = new DataSource({
     type: "mysql",
     host: "localhost",
     port: 3306,
-    username: "test",
-    password: "test",
-    database: "test",
+    username: "root",
+    password: "1234",
+    database: "ElectroverseDB",
     entities: [Product]
 })
 
-AppDataSource.initialize(
+AppDataSource.initialize()
     .then(() => {
-
+        console.log("Sexo")
     })
     .catch((error) => console.log(error))
-)
