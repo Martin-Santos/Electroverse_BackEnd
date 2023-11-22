@@ -6,17 +6,21 @@ export class Product {
     id!: number
 
     @Column({
-        length:100,
+        length:45,
     })
-    name!: string
+    name: string
+
+    @Column()
+    price: number
 
     @Column({
-        length:100,
+        length:200,
     })
-    price!: number
+    img: string
 
-    @Column({
-        length:100,
-    })
-    photo!: string
+    constructor(name:string, price: number, img: string){
+        this.name = name;
+        this.price = price;
+        this.img = img;
+    } 
 }

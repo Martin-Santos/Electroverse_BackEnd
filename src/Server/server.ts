@@ -1,35 +1,18 @@
 import express from "express";
 import cors from "cors";
-import { AppRoutes } from "./routes";
-import { AppDataSource } from "../persistance/config";
+import AppRoutes from "./routes";
+import "../persistance/config";
+import 'reflect-metadata';
 
 
-class Server {
-  private readonly app = express();
-  private readonly port = 8080;
-  public start = async() => {
-    await this.middlewares();
-    this.app.use(AppRoutes.routes)
-    this.app.listen(this.port, () => {
-      console.log("server running in port " + this.port);
-    });
-  };
-  private middlewares = async () => {
-    this.app.use(cors());
-    this.app.use(express.json());
-    try {
-      await AppDataSource.initialize()
-      console.log ("conexion establecida correctamente ")
-    } catch (error) {
-      console.log(error)
-      
-    }
-    
-  };
-}
-
-export default Server;
-
+const App = express()
+const port = 8080
+App.use(cors());
+App.use(express.json())
+App.use("/", AppRoutes)
+App.listen(port, () => {
+  console.log("Server is ON in:", port)
+})
 
 
 
