@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { Product } from "../persistance/product";
 import { AppDataSource } from "../persistance/config";
+import { User } from "../persistance/user";
 
 export class ProductController{
     public readonly getAllProducts =async (_:Request, res: Response) => {
@@ -12,7 +13,20 @@ export class ProductController{
         })
         
     }
-}
+    public readonly login = async (req:Request, res: Response) => {
+        const {name, password} = req.body
+        try{
+            const comparador = await AppDataSource.manager.findOne(User, {where:{name, password}})
+            if (comparador) {res.json({mensaje: "ingreso correcto"})}
+            else {res.json({mensaje: "ingreso fallido"})}
+        }
+        catch(error){
+            console.log(error)
+        }
+    }
+};
+
+
 
 
 // let productoMercancia = [ 

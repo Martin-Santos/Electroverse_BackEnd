@@ -1,5 +1,6 @@
 import {DataSource} from 'typeorm';
 import {Product} from './product';
+import { User } from './user';
 import "reflect-metadata";
 
 export const AppDataSource = new DataSource({
@@ -11,7 +12,7 @@ export const AppDataSource = new DataSource({
     database: "ElectroverseDB",
     synchronize: true,
     logging:true,
-    entities: [Product]
+    entities: [Product, User]
 })
 
 AppDataSource.initialize()
