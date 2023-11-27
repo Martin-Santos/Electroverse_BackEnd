@@ -24,6 +24,76 @@ export class ProductController{
             console.log(error)
         }
     }
+
+    public readonly createproduct = async (req: Request, res: Response) => {
+        const { price, name, imageUrl } = req.body
+        const productRepository = AppDataSource.getRepository(Product)
+        const product = await productRepository.findOne({
+            where: {
+                name
+            }
+
+        })
+        if (product) {
+            return res.status(400).json({
+                error: ' El producto con nombre ' + name + ' ya existe '
+
+            })
+        }
+
+        try {
+            const newProduct = new Product(name, price, imageUrl)
+            await productRepository.save(newProduct)
+            return res.status(201).json({
+                mensaje: 'producto creado',
+                producto: newProduct
+            })
+
+
+
+
+        } catch (error) {
+            return res.status(500).json({
+                error: 'no se encontro el producto'
+            })
+        }
+
+
+
+
+
+    }
+
+    //CONTROLADOR DEL REGISTER
+    public readonly register = async (req:Request, res:Response) =>{
+        const {email,password,name} = req.body
+        console.log (req.body)
+        
+         
+        const comparador = await AppDataSource.manager.findOne(User, {where:{email}})
+        if (comparador) {
+            return res.status(400).json({ error: 'El Usuario o Email ya esta en uso' });
+        } else {
+
+            const newUser = new User(name, email, password);
+            try {
+                await AppDataSource.manager.save(newUser)
+                return res.status(200).json({mensaje: 'el usuario se guardo correctamente'})
+                
+            } catch (error) {
+                console.log(error)
+
+                return res.status(400).json({mensaje:'no se puso crear el usuario'})
+                
+            }
+           
+        }
+    }
+
+
+
+
+
 };
 
 
