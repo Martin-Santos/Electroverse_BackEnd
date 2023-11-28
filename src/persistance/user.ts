@@ -11,14 +11,14 @@ export class User {
     name: string
 
     @Column()
-    email: number
+    email: string
 
     @Column({
         length:200,
     })
     password: string
 
-    constructor(name:string, price: number, img: string){
+    constructor(name:string, price: string, img: string){
         this.name = name;
         this.email = price;
         this.password = img;

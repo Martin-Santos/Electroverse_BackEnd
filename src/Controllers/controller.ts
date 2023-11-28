@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { Product } from "../persistance/product";
 import { AppDataSource } from "../persistance/config";
 import { User } from "../persistance/user";
+import bcrypt from 'bcrypt';
 
 export class ProductController{
     public readonly getAllProducts =async (_:Request, res: Response) => {
@@ -13,17 +14,46 @@ export class ProductController{
         })
         
     }
-    public readonly login = async (req:Request, res: Response) => {
-        const {name, password} = req.body
-        try{
-            const comparador = await AppDataSource.manager.findOne(User, {where:{name, password}})
-            if (comparador) {res.json({mensaje: "ingreso correcto"})}
-            else {res.json({mensaje: "ingreso fallido"})}
+    public readonly login = async (req: Request, res: Response) => {
+        const { name, password } = req.body;
+
+        try {
+            // Buscar el usuario por el nombre
+            const user = await AppDataSource.manager.findOne(User, { where: { name } });
+
+            // Verificar si el usuario existe
+            if (user) {
+                // Comparar la contraseña ingresada con la almacenada en la base de datos
+                const passwordMatch = await bcrypt.compare(password, user.password);
+
+                if (passwordMatch) {
+                    res.json({ mensaje: "Ingreso correcto" });
+                } else {
+                    res.json({ mensaje: "Ingreso fallido - Contraseña incorrecta" });
+                }
+            } else {
+                res.json({ mensaje: "Ingreso fallido - Usuario no encontrado" });
+            }
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ mensaje: "Error interno del servidor" });
         }
-        catch(error){
-            console.log(error)
-        }
-    }
+    };
+
+
+
+
+    // public readonly login = async (req:Request, res: Response) => {
+    //     const {email, password} = req.body
+    //     try{
+    //         const comparador = await AppDataSource.manager.findOne(User, {where:{email, password}})
+    //         if (comparador) {res.json({mensaje: "ingreso correcto"})}
+    //         else {res.json({mensaje: "ingreso fallido"})}
+    //     }
+    //     catch(error){
+    //         console.log(error)
+    //     }
+    // }
 
     public readonly createproduct = async (req: Request, res: Response) => {
         const { price, name, imageUrl } = req.body
@@ -65,30 +95,40 @@ export class ProductController{
     }
 
     //CONTROLADOR DEL REGISTER
-    public readonly register = async (req:Request, res:Response) =>{
-        const {email,password,name} = req.body
-        console.log (req.body)
-        
-         
-        const comparador = await AppDataSource.manager.findOne(User, {where:{email}})
-        if (comparador) {
-            return res.status(400).json({ error: 'El Usuario o Email ya esta en uso' });
-        } else {
-
-            const newUser = new User(name, email, password);
-            try {
-                await AppDataSource.manager.save(newUser)
-                return res.status(200).json({mensaje: 'el usuario se guardo correctamente'})
-                
-            } catch (error) {
-                console.log(error)
-
-                return res.status(400).json({mensaje:'no se puso crear el usuario'})
-                
+    public readonly registerUser = async (req: Request, res: Response) => {
+        const { formData } = req.body;
+    
+        const name = formData.usuario;
+        const email = formData.email;
+        const password = formData.password;
+    
+        try {
+            
+    
+            const existingUser = await AppDataSource.manager.findOne(User, { where: { name, email } });
+    
+            if (existingUser) {
+                return res.status(400).json({ error: 'El Usuario o Email ya esta en uso' });
+            } else {
+                const newUser = new User(name, email, password);
+    
+                try {
+                    await AppDataSource.manager.save(newUser);
+                    
+    
+                    return res.status(201).json({ message: 'Usuario registrado exitosamente' });
+                } catch (error) {
+                    console.error('Error al registrar el usuario:', error);
+                    return res.status(500).json({ error: 'Error al conectar con la base de datos' });
+                }
             }
-           
-        }
-    }
+    
+        } catch (err) {
+            console.error('Error al registrar el usuario:', err);
+            return res.status(500).json({ error: 'Error interno del servidor' });
+        }  
+    };
+    
 
 
 

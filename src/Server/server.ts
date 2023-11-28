@@ -1,15 +1,14 @@
 import express from "express";
 import cors from "cors";
-import AppRoutes from "./routes";
+import router from "./routes";
 import "../persistance/config";
 import 'reflect-metadata';
-
 
 const App = express()
 const port = 8080
 App.use(cors());
 App.use(express.json())
-App.use("/", AppRoutes)
+App.use("/", router)
 App.listen(port, () => {
   console.log("Server is ON in:", port)
 })
