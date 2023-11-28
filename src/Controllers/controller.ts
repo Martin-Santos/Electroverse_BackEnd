@@ -18,8 +18,8 @@ export const login = async (req:Request, res: Response) => {
     const {email, password} = req.body
     try{
         const comparador = await AppDataSource.manager.findOne(User, {where:{email, password}})
-        if (comparador) {res.json({mensaje: "Secion iniciada"})}
-        else {res.status(400).json({mensaje: "Secion Fallida"})}
+        if (comparador) {res.json({mensaje: "Has iniciado sesión"})}
+        else {res.status(400).json({mensaje: "No se ha iniciado sesión"})}
     }catch(error){
         console.log(error)
     }
@@ -83,11 +83,9 @@ export const registerUser = async (req: Request, res: Response) => {
     const password = formData.password;
     
     try {
-            
+        const usuarioExistente = await AppDataSource.manager.findOne(User, { where: { name, email } });
     
-        const existingUser = await AppDataSource.manager.findOne(User, { where: { name, email } });
-    
-        if (existingUser) {
+        if (usuarioExistente) {
             return res.status(400).json({ error: 'El Usuario o Email ya esta en uso' });
         } else {
             const newUser = new User(name, email, password);
@@ -98,11 +96,10 @@ export const registerUser = async (req: Request, res: Response) => {
     
                 return res.status(201).json({ message: 'Usuario registrado exitosamente' });
             } catch (error) {
-                console.error('Error al registrar el usuario:', error);
-                return res.status(500).json({ error: 'Error al conectar con la base de datos' });
+                console.error('Error al registrar el nuevo usuario:', error);
+                return res.status(500).json({ error: 'Fallo al conectar con la base de datos' });
             }
     }
-    
     } catch (err) {
         console.error('Error al registrar el usuario:', err);
         return res.status(500).json({ error: 'Error interno del servidor' });
